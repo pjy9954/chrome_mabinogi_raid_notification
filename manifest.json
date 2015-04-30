@@ -1,0 +1,29 @@
+{
+  "manifest_version": 2,
+
+  "name": "마비노기 레이드 출현 알람",
+  "description": "케이포트의 공유노기 사이트의 데이터를 활용하여 지정한 마비노기 레이드몹의 출현을 알려줍니다",
+  "version": "1.0.3",
+
+  "page_action": {},
+
+  "options_ui": {
+    "page": "options.html",
+    "chrome_style": true
+  },
+
+  "icons": {
+    "48": "image/48.png",
+    "82": "image/82.png",
+    "128": "image/128.png"
+  },
+  
+  "background": {
+    "scripts": ["js/socket.io.js","js/background.js"]
+  },
+
+  "permissions": [
+    "notifications",
+    "storage"
+  ]
+}
