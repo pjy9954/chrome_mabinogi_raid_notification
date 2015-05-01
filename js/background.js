@@ -12,7 +12,12 @@ function show_notification_webkit() {
 }
 
 function make_title(data) {
-	var title = decodeURIComponent(data.name).split("]")[1]+"님의 제보입니다";
+	var title;
+	var name = decodeURIComponent(data.name).split("]")[1];
+
+	if (!name) name = decodeURIComponent(data.name);
+	
+	title = name + "님의 제보입니다";
 
 	return title;
 }
