@@ -13,9 +13,9 @@
   },
 
   "icons": {
-    "48": "image/48.png",
-    "82": "image/82.png",
-    "128": "image/128.png"
+    "48": "image/48_black.png",
+    "82": "image/82_black.png",
+    "128": "image/128_black.png"
   },
   
   "background": {

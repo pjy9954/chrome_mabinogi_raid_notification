@@ -3,7 +3,7 @@ function show_notification(message) {
 		type: "basic",
 		title: "케이포트의 공유노기",
 		message: message,
-		iconUrl: "image/82.png"
+		iconUrl: "image/82_black.png"
 	}
 
 	chrome.notifications.create(opt);
