@@ -1,30 +1,14 @@
-function show_notification_webkit(title, body, id) {
+function show_notification_webkit() {
+	if (arguments.length !== 3)
+		arguments[2] = "";
+
 	var opt = {
-		body: body,
-		tag: id,
+		body: arguments[1],
+		tag: arguments[2],
 		icon: "image/48_black.png"
 	}
-	var notification = new Notification(title, opt);
+	var notification = new Notification(arguments[0], opt);
 	return notification;
-}
-
-function make_body_arrival(data) {
-	var str = "";
-
-	str = data.channel + "채널에 ";
-
-	switch(data.boss) {
-		case "B": str+="블랙드래곤이 "; break;
-		case "W": str+="화이트드래곤이 "; break;
-		case "R": str+="레드드래곤이 "; break;
-		case "D": str+="사막드래곤이 "; break;
-		case "E": str+="트릭스터가 "; break;
-		default : return 1;
-	}
-
-	str+="출현했습니다";
-
-	return str;
 }
 
 function make_title(boss) {
@@ -44,24 +28,97 @@ function make_title(boss) {
 	return title;
 }
 
+function make_body_arrival(data, flag) {
+	var str = "";
 
-function make_body_now(data) {
+	str = data.channel + "채널에 ";
+
+	if (flag === "n")
+		str+="출현한 ";
+
+	switch(data.boss) {
+		case "B": str+="블랙드래곤"; break;
+		case "W": str+="화이트드래곤"; break;
+		case "R": str+="레드드래곤"; break;
+		case "D": str+="사막드래곤"; break;
+		case "E": str+="트릭스터"; break;
+		default : return 1;
+	}
+
+	if (flag === "y")
+		str+="이 출현했습니다";
+	else
+		str+="에 관한 제보는 잘못된 제보입니다";
+
+	return str;
+}
+
+function make_body_now(data, flag) {
 	var str = "";
 
 	str = data.channel + "채널에서 ";
 
+	if (flag === "n")
+		str+="잡고있는 ";
+
 	switch(data.boss) {
-		case "B": str+="블랙드래곤을 "; break;
-		case "W": str+="화이트드래곤을 "; break;
-		case "R": str+="레드드래곤을 "; break;
-		case "D": str+="사막드래곤을 "; break;
-		case "E": str+="트릭스터를 "; break;
+		case "B": str+="블랙드래곤"; break;
+		case "W": str+="화이트드래곤"; break;
+		case "R": str+="레드드래곤"; break;
+		case "D": str+="사막드래곤"; break;
+		case "E": str+="트릭스터"; break;
 		default : return 1;
 	}
 
-	str+="잡고있습니다";
+	if (flag === "y")
+		str+="을 잡고있습니다";
+	else
+		str+="에 관한 제보는 잘못된 제보입니다";
 
 	return str;
+}
+
+function make_body_kill(data, flag) {
+	var str = "";
+
+	str = data.channel + "채널에서 ";
+
+	if (flag === "n")
+		str+="처치한 ";
+
+	switch(data.boss) {
+		case "B": str+="블랙드래곤"; break;
+		case "W": str+="화이트드래곤"; break;
+		case "R": str+="레드드래곤"; break;
+		case "D": str+="사막드래곤"; break;
+		case "E": str+="트릭스터"; break;
+		default : return 1;
+	}
+
+	if (flag === "y")
+		str+="을 처치하였습니다";
+	else
+		str+="에 관한 제보는 잘못된 제보입니다";
+
+	return str;
+}
+
+function close_now_notification(id) {
+	for (var i=nowNotificationsArray.length-1 ; i>=0 ; i--) {
+		if (nowNotificationsArray[i].tag === id) {
+			nowNotificationsArray[i].close();
+			nowNotificationsArray.splice(i,1);
+		}
+	}
+}
+
+function set_notification_close_timeout(notification) {
+	var sec = 1000;
+	var millisec = 7 * sec;
+
+	setTimeout(function() {
+		notification.close();
+	}, millisec);
 }
 
 var serverArray = new Array("L", "H", "W", "M");
@@ -88,45 +145,51 @@ chrome.storage.local.get({
 		sockets[i].on("client", function(data){
 			if (data.state.split("_")[0] != "checker") {
 				var status = data.state.split("_")[0];
-				var timelimit;
-				var notifyBody;
+				var flag = data.state.split("_")[1];
 				var notifyTitle;
+				var notifyBody;
 				var notification;
 				var notificationId = data.server + data.boss + data.channel;
-				var sec = 1000;
+				
 
 				notifyTitle = make_title(data.boss);			
 
 				switch(status){
 					case "arrival":
-					timelimit = 7*sec;
-					notifyBody = make_body_arrival(data);
-					notification = show_notification_webkit(notifyTitle, notifyBody, notificationId);
+						notifyBody = make_body_arrival(data, flag);
+						notification = show_notification_webkit(notifyTitle, notifyBody, notificationId);
+						set_notification_close_timeout(notification);
 					break;
 
 					case "now":
-					notifyBody = make_body_now(data);
-					notification = show_notification_webkit(notifyTitle, notifyBody, notificationId);
-					nowNotificationsArray.push(notification);
+						notifyBody = make_body_now(data, flag);
+						notification = show_notification_webkit(notifyTitle, notifyBody, notificationId);
+						if (flag === "y"){
+							nowNotificationsArray.push(notification);
+						}
+						else {
+							close_now_notification(notificationId);
+							set_notification_close_timeout(notification);
+						}
 					break;
 
 					case "0":
-					for (var i=0 ; i<nowNotificationsArray.length ; i++) {
-						if (nowNotificationsArray[i].tag === notificationId) {
-							nowNotificationsArray[i].close();
-							nowNotificationsArray.splice(i,1);
+						notifyBody = make_body_kill(data, flag);
+						notification = show_notification_webkit(notifyTitle, notifyBody);
+						set_notification_close_timeout(notification);
+						if (flag === "y") {
+							close_now_notification(notificationId);
 						}
-					}
+						else {
+							flag = "y";
+							notifyBody = make_body_now(data, flag);
+							notification = show_notification_webkit(notifyTitle, notifyBody, notificationId);
+							nowNotificationsArray.push(notification);
+						}
 					break;
 
 					default : 
 					return 1;
-				}
-
-				if (timelimit) {
-					setTimeout(function() {
-						notification.close();
-					}, timelimit);
 				}
 			}
 		});
