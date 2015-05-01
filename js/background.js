@@ -11,19 +11,8 @@ function show_notification_webkit() {
 	return notification;
 }
 
-function make_title(boss) {
-	var title;
-
-	switch(boss) {
-		case "B": title="블랙드래곤"; break;
-		case "W": title="화이트드래곤"; break;
-		case "R": title="레드드래곤"; break;
-		case "D": title="사막드래곤"; break;
-		case "E": title="트릭스터"; break;
-		default : return 1;
-	}
-
-	title += " 진행상황 알림";
+function make_title(data) {
+	var title = decodeURIComponent(data.name).split("]")[1]+"님의 제보입니다";
 
 	return title;
 }
@@ -154,8 +143,7 @@ chrome.storage.local.get({
 				var notification;
 				var notificationId = data.server + data.boss + data.channel;
 				
-
-				notifyTitle = make_title(data.boss);			
+				notifyTitle = make_title(data);			
 
 				switch(status){
 					case "arrival":
@@ -190,9 +178,6 @@ chrome.storage.local.get({
 							nowNotificationsArray.push(notification);
 						}
 					break;
-
-					default : 
-					return 1;
 				}
 			}
 		});
