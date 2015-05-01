@@ -22,9 +22,11 @@ function get_select_raids() {
 function save_options() {
 	var server = get_select_server();
 	var raids = get_select_raids();
+	var second = document.getElementById("notiSec").value;
 	chrome.storage.local.set({
 		server: server,
-		raids: raids
+		raids: raids,
+		second: second
 	});
 
 	chrome.runtime.sendMessage(chrome.runtime.id, "refresh");
@@ -33,7 +35,8 @@ function save_options() {
 function restore_options() {
 	chrome.storage.local.get({
 		server: 1,
-		raids: [true, true, false, false]
+		raids: [true, true, false, false],
+		second: 7
 	}, function(items) {
 		var radioBtns = document.getElementsByClassName("radioBtn");
 		var raids = document.getElementsByClassName("checkbox");
@@ -42,7 +45,8 @@ function restore_options() {
 		raids[0].checked = items.raids[0];
 		raids[1].checked = items.raids[1];
 		raids[2].checked = items.raids[2];
-		raids[3].checked = items.raids[3];		
+		raids[3].checked = items.raids[3];
+		document.getElementById("notiSec").value = items.second;
 	});
 }
 

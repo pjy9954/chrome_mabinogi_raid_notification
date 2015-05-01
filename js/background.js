@@ -114,7 +114,7 @@ function close_now_notification(id) {
 
 function set_notification_close_timeout(notification) {
 	var sec = 1000;
-	var millisec = 7 * sec;
+	var millisec = second * sec;
 
 	setTimeout(function() {
 		notification.close();
@@ -125,15 +125,18 @@ var serverArray = new Array("L", "H", "W", "M");
 var raidArray = new Array("B", "W", "D", "R");
 var server;
 var raids = [];
+var second;
 var sockets = [];
 var nowNotificationsArray = [];
 
 chrome.storage.local.get({
 	server: 1,
-	raids: [true, true, false, false]
+	raids: [true, true, false, false],
+	second: 7
 }, function(items) {
 	server = items.server;
 	raids = items.raids;
+	second = items.second;
 
 	for (var i=0 ; i<raids.length ; i++) {
 		if (raids[i] === true) {
