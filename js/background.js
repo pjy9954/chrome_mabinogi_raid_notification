@@ -162,8 +162,7 @@ chrome.storage.local.get({
 						notification = show_notification_webkit(notifyTitle, notifyBody, notificationId);
 						if (flag === "y"){
 							nowNotificationsArray.push(notification);
-						}
-						else {
+						} else (flag === "n") {
 							close_now_notification(notificationId);
 							set_notification_close_timeout(notification);
 						}
@@ -176,7 +175,7 @@ chrome.storage.local.get({
 						if (flag === "y") {
 							close_now_notification(notificationId);
 						}
-						else {
+						else (flag === "n") {
 							flag = "y";
 							notifyBody = make_body_now(data, flag);
 							notification = show_notification_webkit(notifyTitle, notifyBody, notificationId);
