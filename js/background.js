@@ -100,6 +100,32 @@ function make_body_kill(data, flag) {
 	return str;
 }
 
+function make_body_skip(data, flag) {
+	var str = "";
+
+	str = data.channel + "채널에서 ";
+
+	if (flag === "n" || flag === "c")
+		str+="스킵 하기로한 ";
+
+	switch(data.boss) {
+		case "B": str+="블랙드래곤"; break;
+		case "W": str+="화이트드래곤"; break;
+		case "R": str+="레드드래곤"; break;
+		case "D": str+="사막드래곤"; break;
+		case "E": str+="트릭스터"; break;
+		default : return 1;
+	}
+
+	if (flag === "y")
+		str+="을 스킵하기로 하였습니다";
+	else if (flag === "n" || flag === "c")
+		str+="에 관한 제보는 잘못된 제보입니다";
+	else return 1;
+
+	return str;
+}
+
 function close_now_notification(id) {
 	for (var i=nowNotificationsArray.length-1 ; i>=0 ; i--) {
 		if (nowNotificationsArray[i].tag === id) {
@@ -158,7 +184,7 @@ chrome.storage.local.get({
 						notifyBody = make_body_arrival(data, flag);
 						if (notifyBody === 1) break;
 
-						notification = show_notification_webkit(notifyTitle, notifyBody, notificationId);
+						notification = show_notification_webkit(notifyTitle, notifyBody);
 						set_notification_close_timeout(notification);
 					break;
 
@@ -187,10 +213,20 @@ chrome.storage.local.get({
 							flag = "y";
 							notifyBody = make_body_now(data, flag);
 							if (notifyBody === 1) break;
-							
+
 							notification = show_notification_webkit(notifyTitle, notifyBody, notificationId);
 							nowNotificationsArray.push(notification);
 						}
+					break;
+
+					case "skip":
+						notifyBody = make_body_skip(data, flag);
+						if (notifyBody === 1) break;
+
+						notification = show_notification_webkit(notifyTitle, notifyBody);
+						set_notification_close_timeout(notification);
+						if (flag === "y") {
+							close_now_notification(notificationId);
 					break;
 				}
 			}
