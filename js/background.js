@@ -27,7 +27,7 @@ function make_body_arrival(data, flag) {
 
 	str = data.channel + "채널에 ";
 
-	if (flag === "n")
+	if (flag === "n" || flag === "c")
 		str+="출현한 ";
 
 	switch(data.boss) {
@@ -41,8 +41,9 @@ function make_body_arrival(data, flag) {
 
 	if (flag === "y")
 		str+="이 출현했습니다";
-	else
+	else if (flag === "n" || flag === "c")
 		str+="에 관한 제보는 잘못된 제보입니다";
+	else return 1;
 
 	return str;
 }
@@ -52,7 +53,7 @@ function make_body_now(data, flag) {
 
 	str = data.channel + "채널에서 ";
 
-	if (flag === "n")
+	if (flag === "n" || flag === "c")
 		str+="잡고있는 ";
 
 	switch(data.boss) {
@@ -66,8 +67,9 @@ function make_body_now(data, flag) {
 
 	if (flag === "y")
 		str+="을 잡고있습니다";
-	else
+	else if (flag === "n" || flag === "c")
 		str+="에 관한 제보는 잘못된 제보입니다";
+	else return 1;
 
 	return str;
 }
@@ -77,7 +79,7 @@ function make_body_kill(data, flag) {
 
 	str = data.channel + "채널에서 ";
 
-	if (flag === "n")
+	if (flag === "n" || flag === "c")
 		str+="처치한 ";
 
 	switch(data.boss) {
@@ -91,8 +93,9 @@ function make_body_kill(data, flag) {
 
 	if (flag === "y")
 		str+="을 처치하였습니다";
-	else
+	else if (flag === "n" || flag === "c")
 		str+="에 관한 제보는 잘못된 제보입니다";
+	else return 1;
 
 	return str;
 }
@@ -153,16 +156,20 @@ chrome.storage.local.get({
 				switch(status){
 					case "arrival":
 						notifyBody = make_body_arrival(data, flag);
+						if (notifyBody === 1) break;
+
 						notification = show_notification_webkit(notifyTitle, notifyBody, notificationId);
 						set_notification_close_timeout(notification);
 					break;
 
 					case "now":
 						notifyBody = make_body_now(data, flag);
+						if (notifyBody === 1) break;
+
 						notification = show_notification_webkit(notifyTitle, notifyBody, notificationId);
 						if (flag === "y"){
 							nowNotificationsArray.push(notification);
-						} else (flag === "n") {
+						} else if (flag === "n" || flag === "c") {
 							close_now_notification(notificationId);
 							set_notification_close_timeout(notification);
 						}
@@ -170,14 +177,17 @@ chrome.storage.local.get({
 
 					case "0":
 						notifyBody = make_body_kill(data, flag);
+						if (notifyBody === 1) break;
+
 						notification = show_notification_webkit(notifyTitle, notifyBody);
 						set_notification_close_timeout(notification);
 						if (flag === "y") {
 							close_now_notification(notificationId);
-						}
-						else (flag === "n") {
+						} else if (flag === "n" || flag === "c") {
 							flag = "y";
 							notifyBody = make_body_now(data, flag);
+							if (notifyBody === 1) break;
+							
 							notification = show_notification_webkit(notifyTitle, notifyBody, notificationId);
 							nowNotificationsArray.push(notification);
 						}
