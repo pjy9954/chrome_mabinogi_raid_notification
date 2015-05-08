@@ -225,7 +225,7 @@ chrome.storage.local.get({
 
 						notification = show_notification_webkit(notifyTitle, notifyBody);
 						set_notification_close_timeout(notification);
-						if (flag === "y") {
+						if (flag === "y")
 							close_now_notification(notificationId);
 					break;
 				}
